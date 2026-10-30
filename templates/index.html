@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Breach Impact Calculator</title>
+    <style>
+        body { background-color: #07090e; color: #c9d1d9; font-family: 'Segoe UI', monospace; margin: 0; padding: 30px 20px; display: flex; justify-content: center; }
+        .wrapper { width: 900px; display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        
+        .panel { background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 25px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .full-width { grid-column: span 2; border-color: #ff2222; box-shadow: 0 0 25px rgba(255, 34, 34, 0.2); text-align: center; }
+        
+        h1 { color: #ff2222; margin: 0 0 8px 0; font-size: 22px; letter-spacing: 1px; }
+        p.desc { color: #8b949e; font-size: 12px; margin: 0 0 20px 0; }
+        
+        label { display: block; font-size: 12px; color: #8b949e; margin-bottom: 6px; text-transform: uppercase; }
+        select, input { width: 100%; padding: 10px; background: #161b22; border: 1px solid #30363d; border-radius: 6px; color: #fff; font-size: 13px; box-sizing: border-box; margin-bottom: 15px; outline: none; }
+        select:focus, input:focus { border-color: #ff2222; }
+        
+        button { width: 100%; background: #ff2222; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        button:hover { background: #d91b1b; }
+
+        .stat-title { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 32px; font-weight: bold; color: #ff2222; margin: 8px 0; }
+        
+        .breakdown-card { background: #161b22; border: 1px solid #30363d; padding: 15px; border-radius: 8px; margin-bottom: 12px; }
+        .row-space { display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; }
+        
+        .progress-bg { background: #07090e; height: 6px; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .progress-bar { height: 100%; background: #ff2222; transition: width 0.4s ease; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Input Form Panel -->
+        <div class="panel">
+            <h1>🏢 BREACH IMPACT CALCULATOR</h1>
+            <p class="desc">Estimate potential financial, legal, and reputational data breach costs for a business.</p>
+            
+            <form method="POST">
+                <label>Industry Sector</label>
+                <select name="industry">
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Finance">Finance & Banking</option>
+                    <option value="Technology">Technology & SaaS</option>
+                    <option value="E-Commerce">E-Commerce & Retail</option>
+                    <option value="Education">Education</option>
+                </select>
+
+                <label>Number of Records Compromised</label>
+                <input type="number" name="records" required value="50000" min="1000" step="1000">
+
+                <label>Data Sensitivity Level</label>
+                <select name="sensitivity">
+                    <option value="Low">Low (Public / Basic Info)</option>
+                    <option value="Medium" selected>Medium (Internal Credentials)</option>
+                    <option value="High">High (Proprietary / Customer PII)</option>
+                    <option value="Critical (PII + Financial)">Critical (Full Financials + PII)</option>
+                </select>
+
+                <button type="submit">Calculate Executive Risk</button>
+            </form>
+        </div>
+
+        <!-- Estimated Impact Display Panel -->
+        <div class="panel" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 5px;">🏛️</div>
+            <div class="stat-title">Estimated Total Potential Cost</div>
+            <div class="stat-value">{{ result.total_cost if result else '$0.00' }}</div>
+            <p style="font-size: 11px; color: #8b949e; margin: 0;">Aggregate risk evaluation across financial, legal, and brand dimensions.</p>
+        </div>
+
+        <!-- Breakdown Panel -->
+        <div class="panel full-width">
+            <h3 style="margin-top: 0; color: #c9d1d9; text-align: left; border-bottom: 1px solid #30363d; padding-bottom: 10px;">Executive Cost Breakdown</h3>
+            
+            {% if result %}
+            <div class="breakdown-card">
+                <div class="row-space">
+                    <span>Direct Financial Loss</span>
+                    <span style="color: #ff2222;">{{ result.financial_loss }}</span>
+                </div>
+                <div class="progress-bg">
+                    <div class="progress-bar" style="width: {{ result.fin_width }};"></div>
+                </div>
+            </div>
+
+            <div class="breakdown-card">
+                <div class="row-space">
+                    <span>Legal & Compliance Fines</span>
+                    <span style="color: #ff2222;">{{ result.legal_costs }}</span>
+                </div>
+                <div class="progress-bg">
+                    <div class="progress-bar" style="width: {{ result.legal_width }};"></div>
+                </div>
+            </div>
+
+            <div class="breakdown-card" style="margin-bottom: 0;">
+                <div class="row-space">
+                    <span>Reputation Damage Score</span>
+                    <span style="color: #ff2222;">{{ result.reputation_score }}</span>
+                </div>
+                <div class="progress-bg">
+                    <div class="progress-bar" style="width: {{ result.rep_width }};"></div>
+                </div>
+            </div>
+            {% else %}
+            <div style="color: #8b949e; font-size: 13px; padding: 20px;">Configure parameters above and click "Calculate Executive Risk" to generate model report.</div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
